@@ -37,15 +37,16 @@ class ubuntu(
           key_server => 'pgp.mit.edu';
       }
       apt::ppa {
+        'ppa:duplicity-team/ppa':
+          before => Package['duplicity'];
+
         'ppa:git-core/ppa':
           before => Package['git'];
 
         'ppa:keithw/mosh': 
           before => Package['mosh'];
-
-        'ppa:duplicity-team/ppa':
-          before => Package['duplicity'];
       }
+      ensure_packages([ 'duplicity', 'git', 'mosh' ])
     }
     '13.10': {
       apt::source {
