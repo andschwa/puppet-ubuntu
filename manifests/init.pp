@@ -1,67 +1,72 @@
 class ubuntu(
-  $repos = [ 'security', ],
+  $repos = 'main universe',
   $release_location = 'http://archive.ubuntu.com/ubuntu/',
   $security_location = 'http://security.ubuntu.com/ubuntu',
   ) {
+
+  Apt::Source {
+    location => $ubuntu::release_location,
+    repos    => $ubuntu::repos,
+  }
 
   Class['apt'] -> Package <| provider == apt |>
 
   case $operatingsystemrelease {
     '12.04': {
-      apt::source { 'precise':
-        location => $ubuntu::release_location,
-        repos    => $ubuntu::repos,
+      apt::source {
+        'precise': ;
+
+        'updates':
+          release  => 'precise-updates';
+
+        'security':
+          release  => 'precise-security';
+
+        'proposed':
+          release => 'precise-proposed',
+          pin     => 400;
+
+        'backports':
+          release => 'precise-backports',
+          pin     => 200;
+
+        'puppetlabs':
+          location   => 'http://apt.puppetlabs.com',
+          repos      => 'main dependencies',
+          key        => '4BD6EC30',
+          key_server => 'pgp.mit.edu';
       }
-      apt::source { 'precise-updates':
-        location => $ubuntu::release_location,
-        release  => 'precise-updates',
-        repos    => $ubuntu::repos,
+      apt::ppa {
+        'ppa:git-core/ppa':
+          before => Package['git'];
+
+        'ppa:keithw/mosh': 
+          before => Package['mosh'];
+
+        'ppa:duplicity-team/ppa':
+          before => Package['duplicity'];
       }
-      apt::source { 'precise-security':
-        location => $ubuntu::security_location,
-        release  => 'precise-security',
-        repos    => $ubuntu::repos,
-      }
-      apt::source { 'puppetlabs':
-        location   => 'http://apt.puppetlabs.com',
-        repos      => 'main dependencies',
-        key        => '4BD6EC30',
-        key_server => 'pgp.mit.edu',
-      }
-      apt::ppa { 'ppa:git-core/ppa':
-        before => Package['git']
-      }
-      apt::ppa { 'ppa:keithw/mosh': 
-        before => Package['mosh']
-      }
-      ensure_resource('package', 'mosh', {'ensure' => 'present'})
-      ensure_resource('package', 'git', {'ensure' => 'latest'})
     }
     '13.10': {
-      apt::source { 'saucy':
-        location => $ubuntu::release_location,
-        repos    => $ubuntu::repos,
+      apt::source {
+        'saucy': ;
+
+        'saucy-updates':
+          release  => 'saucy-updates';
+
+        'saucy-security':
+          release  => 'saucy-security';
+
+        'puppetlabs':
+          location   => 'http://apt.puppetlabs.com',
+          repos      => 'main',
+          key        => '4BD6EC30',
+          key_server => 'pgp.mit.edu';
       }
-      apt::source { 'saucy-updates':
-        location => $ubuntu::release_location,
-        release  => 'saucy-updates',
-        repos    => $ubuntu::repos,
-      }
-      apt::source { 'saucy-security':
-        location => $ubuntu::security_location,
-        release  => 'saucy-security',
-        repos    => $ubuntu::repos,
-      }
-      apt::source { 'puppetlabs':
-        location   => 'http://apt.puppetlabs.com',
-        repos      => 'main',
-        key        => '4BD6EC30',
-        key_server => 'pgp.mit.edu',
-      }
-      package { 'silversearcher-ag': }
     }
     default: {
       fail("${::lsbdistcodename} is not configured in ubuntu")
     }
   }
+
 }
