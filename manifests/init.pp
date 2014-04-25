@@ -1,7 +1,7 @@
 class ubuntu(
   $repos = 'main universe',
   $location = 'http://archive.ubuntu.com/ubuntu/',
-  $keyserver = 'pgp.mit.edu',  
+  $keyserver = 'pgp.mit.edu',
   $sources = {},
   $ppas = {},
   ) {
@@ -10,8 +10,6 @@ class ubuntu(
     location => $location,
     repos    => $repos,
   }
-
-  Class[ 'apt', 'apt::source', 'apt::ppa' ] -> Package <| provider == apt |>
 
   create_resources('apt::source', $sources, {
     'location' => $location,
