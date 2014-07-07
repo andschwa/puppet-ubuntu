@@ -13,8 +13,8 @@ class ubuntu(
   }
 
   create_resources('apt::source', hiera_hash('ubuntu::sources', {}), {
-    'location' => $location,
-    'repos' => $repos,
+    'location'   => $location,
+    'repos'      => $repos,
     'key_server' => $key_server, } )
 
   create_resources('apt::ppa', hiera_hash('ubuntu::ppas', {}))
